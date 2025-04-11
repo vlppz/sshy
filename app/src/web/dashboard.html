@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSHY</title>
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script>
+      // Apply theme immediately to prevent flickering
+      (function() {
+        try {
+          const savedTheme = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+          // Add a class to prevent transitions during page load
+          document.documentElement.classList.add('no-transition');
+          // Remove the class after the page has loaded
+          window.addEventListener('load', function() {
+            setTimeout(function() {
+              document.documentElement.classList.remove('no-transition');
+            }, 100);
+          });
+        } catch(e) {
+          console.error('Error setting initial theme:', e);
+        }
+      })();
+    </script>
+    <script type="module" src="js/theme.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-title-section">
+                    <h1 class="dashboard-title">SSH Servers</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <span id="user-email"></span>
+                        <button id="logout-btn" class="system-btn">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                    <button id="theme-toggle" class="system-btn">
+                        <i class="bi bi-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="servers-grid">
+            <!-- Empty state (shown when no servers are added) -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-hdd-network"></i>
+                </div>
+                <h3>Welcome to SSHY - All in one SSH manager</h3>
+                <p class="empty-state-text">Add your first SSH server to get started</p>
+                <button class="primary-btn add-server-btn-empty">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Add Server</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab add-server-btn">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+
+    <!-- Add Server Modal -->
+    <div class="modal" id="add-server-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Add New Server</h2>
+                <button class="modal-close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <form id="add-server-form">
+                    <div class="form-scroll">
+                        <div class="form-group">
+                            <label for="server-name">Server Name</label>
+                            <input type="text" id="server-name" placeholder="e.g., Production Server" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="server-address">Server Address</label>
+                            <input type="text" id="server-address" placeholder="e.g., example.com or 192.168.1.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" placeholder="e.g., admin" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Authentication Method</label>
+                            <div class="auth-toggle">
+                                <button type="button" class="auth-option active" data-auth="key">SSH Key</button>
+                                <button type="button" class="auth-option" data-auth="password">Password</button>
+                            </div>
+                        </div>
+                        <div id="ssh-key-input">
+                            <div class="form-group">
+                                <label for="ssh-public-key">SSH Public Key</label>
+                                <div class="key-input-container">
+                                    <textarea id="ssh-public-key" placeholder="Paste your SSH public key here" rows="3"></textarea>
+                                    <button type="button" class="system-btn key-paste-btn" data-target="ssh-public-key">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ssh-private-key">SSH Private Key</label>
+                                <div class="key-input-container">
+                                    <textarea id="ssh-private-key" placeholder="Paste your SSH private key here" rows="3"></textarea>
+                                    <button type="button" class="system-btn key-paste-btn" data-target="ssh-private-key">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="password-input" style="display: none;">
+                            <label for="password">Password</label>
+                            <div class="password-input-container">
+                                <input type="password" id="password" placeholder="Enter server password">
+                                <button type="button" class="system-btn password-toggle-btn">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="system-btn" id="cancel-add-server">Cancel</button>
+                <button type="button" class="primary-btn" id="submit-add-server">Add Server</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Server Modal -->
+    <div class="modal" id="edit-server-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Edit Server</h2>
+                <button class="modal-close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <form id="edit-server-form">
+                    <div class="form-scroll">
+                        <div class="form-group">
+                            <label for="edit-server-name">Server Name</label>
+                            <input type="text" id="edit-server-name" placeholder="e.g., Production Server" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-server-address">Server Address</label>
+                            <input type="text" id="edit-server-address" placeholder="e.g., example.com or 192.168.1.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-username">Username</label>
+                            <input type="text" id="edit-username" placeholder="e.g., admin" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Authentication Method</label>
+                            <div class="auth-toggle">
+                                <button type="button" class="auth-option active" data-auth="key">SSH Key</button>
+                                <button type="button" class="auth-option" data-auth="password">Password</button>
+                            </div>
+                        </div>
+                        <div id="edit-ssh-key-input">
+                            <div class="form-group">
+                                <label for="edit-ssh-public-key">SSH Public Key</label>
+                                <div class="key-input-container">
+                                    <textarea id="edit-ssh-public-key" placeholder="Paste your SSH public key here" rows="3"></textarea>
+                                    <button type="button" class="system-btn key-paste-btn" data-target="edit-ssh-public-key">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-ssh-private-key">SSH Private Key</label>
+                                <div class="key-input-container">
+                                    <textarea id="edit-ssh-private-key" placeholder="Paste your SSH private key here" rows="3"></textarea>
+                                    <button type="button" class="system-btn key-paste-btn" data-target="edit-ssh-private-key">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="edit-password-input" style="display: none;">
+                            <label for="edit-password">Password</label>
+                            <div class="password-input-container">
+                                <input type="password" id="edit-password" placeholder="Enter server password">
+                                <button type="button" class="system-btn password-toggle-btn">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="system-btn" id="cancel-edit-server">Cancel</button>
+                <button type="button" class="primary-btn" id="submit-edit-server">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is authenticated
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('auth_token');
+            const userEmail = localStorage.getItem('user_email');
+            
+            if (!token) {
+                // Redirect to login page if not authenticated
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Display user email if available
+            if (userEmail) {
+                document.getElementById('user-email').textContent = userEmail;
+            }
+            
+            // Theme toggle button positioning
+            const themeToggle = document.getElementById('theme-toggle');
+            const headerTitleSection = document.querySelector('.header-title-section');
+            const headerActions = document.querySelector('.header-actions');
+            
+            function positionThemeToggle(isMobile) {
+                if (isMobile) {
+                    headerTitleSection.appendChild(themeToggle);
+                } else {
+                    headerActions.appendChild(themeToggle);
+                }
+            }
+            
+            // Initial position based on screen size
+            const mediaQuery = window.matchMedia('(max-width: 480px)');
+            positionThemeToggle(mediaQuery.matches);
+            
+            // Listen for screen size changes
+            mediaQuery.addEventListener('change', (e) => {
+                positionThemeToggle(e.matches);
+            });
+            
+            // Theme toggle functionality
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                // Update the icon
+                themeToggle.innerHTML = newTheme === 'dark' 
+                    ? '<i class="bi bi-sun"></i>' 
+                    : '<i class="bi bi-moon"></i>';
+            });
+            
+            // Set initial theme toggle icon based on current theme
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            themeToggle.innerHTML = currentTheme === 'dark' 
+                ? '<i class="bi bi-sun"></i>' 
+                : '<i class="bi bi-moon"></i>';
+            
+            // Handle logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                // Clear auth data from localStorage
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('token_type');
+                localStorage.removeItem('user_email');
+                
+                // Clear auth data from main process by sending empty values
+                try {
+                    // Use window.electron if it's available to update auth data
+                    if (window.electron && typeof window.electron.updateAuth === 'function') {
+                        window.electron.updateAuth({
+                            token: '',
+                            token_type: '',
+                            user_email: ''
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error clearing auth data:', error);
+                }
+                
+                window.location.href = 'index.html';
+            });
+
+            // Modal handling
+            const modal = document.getElementById('add-server-modal');
+            const addServerBtn = document.querySelector('.add-server-btn');
+            const closeModalBtn = document.querySelector('.modal-close');
+            const cancelBtn = document.getElementById('cancel-add-server');
+            const modalBackdrop = document.querySelector('.modal-backdrop');
+            
+            // Toggle authentication method
+            const authOptions = document.querySelectorAll('.auth-option');
+            const sshKeyInput = document.getElementById('ssh-key-input');
+            const passwordInputContainer = document.getElementById('password-input');
+            
+            authOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    authOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    
+                    if (option.dataset.auth === 'key') {
+                        sshKeyInput.style.display = 'block';
+                        passwordInputContainer.style.display = 'none';
+                    } else {
+                        sshKeyInput.style.display = 'none';
+                        passwordInputContainer.style.display = 'block';
+                    }
+                });
+            });
+
+            // Password visibility toggle
+            const passwordToggleBtn = document.querySelector('.password-toggle-btn');
+            const passwordField = document.getElementById('password');
+
+            passwordToggleBtn.addEventListener('click', () => {
+                const isPassword = passwordField.type === 'password';
+                passwordField.type = isPassword ? 'text' : 'password';
+                passwordToggleBtn.innerHTML = isPassword 
+                    ? '<i class="bi bi-eye-slash"></i>' 
+                    : '<i class="bi bi-eye"></i>';
+            });
+
+            // Clipboard paste buttons
+            document.querySelectorAll('.key-paste-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    try {
+                        const text = await navigator.clipboard.readText();
+                        const targetId = btn.dataset.target;
+                        document.getElementById(targetId).value = text;
+                    } catch (err) {
+                        console.error('Failed to read clipboard:', err);
+                    }
+                });
+            });
+
+            // Modal open/close
+            addServerBtn.addEventListener('click', () => {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            });
+
+            const closeModal = () => {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+                document.getElementById('add-server-form').reset();
+            };
+
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', closeModal);
+
+            // Handle form submission
+            // document.getElementById('add-server-form').addEventListener('submit', (e) => {
+            //     e.preventDefault();
+            //     const formData = {
+            //         name: document.getElementById('server-name').value,
+            //         address: document.getElementById('server-address').value,
+            //         username: document.getElementById('username').value,
+            //         authType: document.querySelector('.auth-option.active').dataset.auth,
+            //     };
+
+            //     if (formData.authType === 'key') {
+            //         formData.publicKey = document.getElementById('ssh-public-key').value;
+            //         formData.privateKey = document.getElementById('ssh-private-key').value;
+            //     } else {
+            //         formData.password = document.getElementById('password').value;
+            //     }
+                
+            //     console.log('Server data:', formData);
+            //     closeModal();
+            // });
+        });
+
+        // Server card event listeners
+        document.querySelectorAll('.connect-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const serverCard = e.target.closest('.server-card');
+                const serverName = serverCard.querySelector('.server-name').textContent;
+                console.log(`Connecting to ${serverName}`);
+            });
+        });
+
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const serverCard = e.target.closest('.server-card');
+                const serverName = serverCard.querySelector('.server-name').textContent;
+                console.log(`Editing ${serverName}`);
+            });
+        });
+    </script>
+    <script type="module" src="js/index.bundle.js"></script>
+</body>
+</html> 
