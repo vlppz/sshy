@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('auth_token');
     const userEmail = localStorage.getItem('user_email');
     
-    if (!token) {
+    if (!token && window.location.href.includes('dashboard')) {
         window.location.href = 'index.html';
         return;
     }
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('token_type');
         localStorage.removeItem('user_email');
-        sessionStorage.removeItem('encryption_password');
+        localStorage.removeItem('encryption_password');
         window.location.href = 'index.html';
     });
 }); 

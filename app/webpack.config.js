@@ -23,6 +23,29 @@ const mainConfig = {
   }
 };
 
+// Preload script bundle config
+const preloadConfig = {
+  mode: 'production',
+  target: 'electron-preload',
+  entry: './src/preload.ts',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'preload.js'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
+      }
+    ]
+  },
+  resolve: {
+    extensions: ['.ts', '.js']
+  }
+};
+
 // Web process bundle config
 const webConfig = {
   mode: 'production',
@@ -48,4 +71,4 @@ const webConfig = {
   }
 };
 
-module.exports = [mainConfig, webConfig]; 
+module.exports = [mainConfig, preloadConfig, webConfig]; 

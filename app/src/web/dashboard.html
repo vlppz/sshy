@@ -28,7 +28,7 @@
         }
       })();
     </script>
-    <script type="module" src="js/theme.js"></script>
+    <script type="module" src="js/index.bundle.js"></script>
 </head>
 <body>
     <div class="dashboard-container">
@@ -255,26 +255,6 @@
                 positionThemeToggle(e.matches);
             });
             
-            // Theme toggle functionality
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                
-                // Update the icon
-                themeToggle.innerHTML = newTheme === 'dark' 
-                    ? '<i class="bi bi-sun"></i>' 
-                    : '<i class="bi bi-moon"></i>';
-            });
-            
-            // Set initial theme toggle icon based on current theme
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            themeToggle.innerHTML = currentTheme === 'dark' 
-                ? '<i class="bi bi-sun"></i>' 
-                : '<i class="bi bi-moon"></i>';
-            
             // Handle logout
             document.getElementById('logout-btn').addEventListener('click', () => {
                 // Clear auth data from localStorage
@@ -406,6 +386,5 @@
             });
         });
     </script>
-    <script type="module" src="js/index.bundle.js"></script>
 </body>
 </html> 
