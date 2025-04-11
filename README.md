@@ -2,8 +2,6 @@
 
 SSHY is a modern desktop application that simplifies managing and connecting to your SSH servers. With an intuitive interface, secure credential storage, and quick connection capabilities, SSHY makes server management effortless.
 
-![SSHY Dashboard](https://placehold.co/600x400?text=SSHY+Dashboard)
-
 ## Features
 
 - **Secure Credential Storage**: All authentication data is encrypted locally
