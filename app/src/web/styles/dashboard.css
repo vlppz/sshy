@@ -704,7 +704,7 @@ body {
 }
 
 /* Responsive adjustments for modal */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .modal-container {
         margin: 16px;
         max-height: calc(100vh - 32px);
@@ -720,4 +720,4 @@ body {
         width: 100%;
         margin: 4px 0;
     }
-} 
+}  */
