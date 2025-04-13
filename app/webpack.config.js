@@ -20,6 +20,11 @@ const mainConfig = {
   },
   resolve: {
     extensions: ['.ts', '.js']
+  },
+  externals: {
+    'node-ssh': 'commonjs2 node-ssh',
+    'ssh2': 'commonjs2 ssh2',
+    'cpu-features': 'commonjs2 cpu-features'
   }
 };
 
@@ -63,11 +68,23 @@ const webConfig = {
         test: /\.ts$/,
         use: 'ts-loader',
         exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true
+            }
+          }
+        ]
       }
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js', '.css']
   }
 };
 

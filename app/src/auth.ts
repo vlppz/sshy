@@ -1,8 +1,6 @@
 import { ipcMain } from 'electron';
 import axios from 'axios';
-
-// API configuration
-const API_URL = 'http://localhost:8000';
+import { API_URL } from './config';
 
 // Handle Login
 export const setupAuthHandlers = () => {

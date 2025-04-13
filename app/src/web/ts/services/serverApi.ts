@@ -1,6 +1,5 @@
 import { encryptAuthData } from './encryption';
-
-const API_BASE_URL = 'http://localhost:8000';
+import { API_URL } from '../../../config';
 
 /**
  * Get the authentication headers for API requests
@@ -35,7 +34,7 @@ const getStoredPassword = (): string => {
  */
 export const fetchServers = async (): Promise<ServersResponse> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/servers`, {
+        const response = await fetch(`${API_URL}/api/servers`, {
             method: 'GET',
             headers: getAuthHeaders()
         });
@@ -71,7 +70,7 @@ export const createServer = async (
         const password = getStoredPassword();
         const encrypted_auth_data = encryptAuthData(authData, password);
 
-        const response = await fetch(`${API_BASE_URL}/api/servers`, {
+        const response = await fetch(`${API_URL}/api/servers`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify({
@@ -124,7 +123,7 @@ export const updateServer = async (
             updateData.username = updates.authData.username;
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/servers/${serverId}`, {
+        const response = await fetch(`${API_URL}/api/servers/${serverId}`, {
             method: 'PUT',
             headers: getAuthHeaders(),
             body: JSON.stringify(updateData)
@@ -154,7 +153,7 @@ export const updateServer = async (
  */
 export const deleteServer = async (serverId: number): Promise<{ success: boolean; message?: string }> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/servers/${serverId}`, {
+        const response = await fetch(`${API_URL}/api/servers/${serverId}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
@@ -179,7 +178,7 @@ export const deleteServer = async (serverId: number): Promise<{ success: boolean
  */
 export const getServer = async (serverId: number): Promise<ServerResponse> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/servers/${serverId}`, {
+        const response = await fetch(`${API_URL}/api/servers/${serverId}`, {
             method: 'GET',
             headers: getAuthHeaders()
         });

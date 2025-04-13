@@ -3,9 +3,9 @@ import * as path from 'path';
 import axios from 'axios';
 import { setupAuthHandlers } from './auth';
 import * as fs from 'fs';
-
-// API configuration
-const API_URL = 'http://localhost:8000';
+import * as os from 'os';
+import { API_URL } from './config';
+import { setupTerminalHandlers, cleanupTerminals } from './terminal';
 
 // Store auth data
 let authData = {
@@ -117,19 +117,22 @@ app.whenReady().then(() => {
     loadAuthData();
     createWindow();
     setupAuthHandlers();
+    setupTerminalHandlers();
 
     app.on('activate', function () {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
 });
 
-app.on('window-all-closed', function () {
-    // Save auth data when all windows are closed
+// Clean up on app quit
+app.on('before-quit', () => {
+    // Save auth data
     saveAuthData();
-    if (process.platform !== 'darwin') app.quit();
+    
+    // Clean up terminal connections and temporary files
+    cleanupTerminals();
 });
 
-// Save auth data when app is about to quit
-app.on('before-quit', () => {
-    saveAuthData();
+app.on('window-all-closed', function () {
+    if (process.platform !== 'darwin') app.quit();
 });

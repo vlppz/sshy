@@ -13,6 +13,26 @@
     --fab-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     --modal-backdrop: rgba(0, 0, 0, 0.3);
     --modal-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    --terminal-bg: #f5f5f5;
+    --terminal-fg: #333333;
+    --terminal-cursor: #333333;
+    --terminal-selection: rgba(0, 0, 0, 0.3);
+    --terminal-black: #000000;
+    --terminal-red: #cd3131;
+    --terminal-green: #0dbc79;
+    --terminal-yellow: #e5e510;
+    --terminal-blue: #2472c8;
+    --terminal-magenta: #bc3fbc;
+    --terminal-cyan: #11a8cd;
+    --terminal-white: #e5e5e5;
+    --terminal-bright-black: #666666;
+    --terminal-bright-red: #f14c4c;
+    --terminal-bright-green: #23d18b;
+    --terminal-bright-yellow: #f5f543;
+    --terminal-bright-blue: #3b8eea;
+    --terminal-bright-magenta: #d670d6;
+    --terminal-bright-cyan: #29b8db;
+    --terminal-bright-white: #e5e5e5;
 }
 
 [data-theme="dark"] {
@@ -29,6 +49,26 @@
     --fab-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     --modal-backdrop: rgba(0, 0, 0, 0.5);
     --modal-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    --terminal-bg: #1a1a1a;
+    --terminal-fg: #f8f8f8;
+    --terminal-cursor: #f8f8f8;
+    --terminal-selection: rgba(255, 255, 255, 0.3);
+    --terminal-black: #000000;
+    --terminal-red: #cd3131;
+    --terminal-green: #0dbc79;
+    --terminal-yellow: #e5e510;
+    --terminal-blue: #2472c8;
+    --terminal-magenta: #bc3fbc;
+    --terminal-cyan: #11a8cd;
+    --terminal-white: #e5e5e5;
+    --terminal-bright-black: #666666;
+    --terminal-bright-red: #f14c4c;
+    --terminal-bright-green: #23d18b;
+    --terminal-bright-yellow: #f5f543;
+    --terminal-bright-blue: #3b8eea;
+    --terminal-bright-magenta: #d670d6;
+    --terminal-bright-cyan: #29b8db;
+    --terminal-bright-white: #e5e5e5;
 }
 
 /* Transition prevention during theme change */
@@ -721,3 +761,299 @@ body {
         margin: 4px 0;
     }
 }  */
+
+/* Terminal Modal */
+.fullscreen-modal .modal-container {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.fullscreen-modal .modal-backdrop {
+    background-color: transparent;
+}
+
+.terminal-container {
+    background-color: var(--modal-bg);
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.terminal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.terminal-title i {
+    font-size: 18px;
+    color: var(--primary);
+}
+
+.terminal-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.terminal-content {
+    flex: 1;
+    background-color: #1a1a1a;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    min-height: 0; /* Allow content to shrink */
+}
+
+.terminal-instance {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #1a1a1a;
+    color: #f8f8f8;
+    flex: 1;
+    display: flex;
+}
+
+/* Make sure the terminal takes up all available space */
+.terminal-instance .xterm {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.terminal-instance .xterm-viewport {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.terminal-instance .xterm-screen {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Terminal font and colors */
+.xterm-rows, .xterm-rows span {
+    font-family: Menlo, Monaco, 'Courier New', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+}
+
+/* Make sure cursor is visible */
+.terminal-cursor {
+    background-color: #f8f8f8 !important;
+    color: #1a1a1a !important;
+}
+
+/* Tabbed Interface Styles */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.tabs-container {
+    display: flex;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 8px 0;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+}
+
+/* Add tab-content-container style */
+.tab-content-container {
+    flex: 1;
+    display: flex;
+    position: relative;
+    height: calc(100vh - 41px); /* Subtract the tabs container height */
+    overflow: hidden;
+}
+
+.tab-content {
+    flex: 1;
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs-wrapper {
+    display: flex;
+    overflow-x: auto;
+    flex-grow: 1;
+    scrollbar-width: none; /* Firefox */
+    gap: 2px;
+}
+
+.tabs-wrapper::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    height: 32px;
+    min-width: 140px;
+    max-width: 200px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    background-color: var(--surface);
+    border-radius: 6px 6px 0 0;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+    white-space: nowrap;
+    user-select: none;
+    margin-bottom: -1px;
+    border: 1px solid transparent;
+}
+
+.tab:hover {
+    background-color: var(--background);
+    border-color: var(--border);
+    border-bottom-color: transparent;
+}
+
+.tab.active {
+    color: var(--text);
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-bottom-color: var(--background);
+}
+
+.tab i {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.tab.active i {
+    color: var(--primary);
+}
+
+.tab-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: none;
+    background-color: transparent;
+    color: var(--text-secondary);
+    opacity: 0;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+.tab:hover .tab-close-btn {
+    opacity: 1;
+}
+
+.tab-close-btn:hover {
+    background-color: var(--border);
+    color: var(--text);
+}
+
+.tab-actions {
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+}
+
+.new-tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.new-tab-btn:hover {
+    background-color: var(--background);
+    color: var(--text);
+    border-color: var(--primary);
+}
+
+.new-tab-btn i {
+    font-size: 16px;
+}
+
+/* Dashboard tab specific */
+#dashboard-tab-content, [id^="servers-"] {
+    padding: 0 24px;
+}
+
+/* Terminal tab specific */
+.terminal-tab-content {
+    padding: 0;
+}
+
+.terminal-tab-content .terminal-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--terminal-bg);
+    width: 100%;
+    height: 100%;
+}
+
+.terminal-tab-content .terminal-content {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.terminal-tab-content .terminal-instance {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Adjustments for non-modal terminal */
+.terminal-instance .xterm {
+    padding: 12px;
+    height: 100%;
+}

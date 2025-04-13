@@ -1,6 +1,8 @@
 interface Window {
     electron: {
         invoke(channel: string, data: any): Promise<any>;
+        updateAuth(authData: { token: string, token_type: string, user_email: string }): void;
+        onTerminalData(callback: (data: { terminalId: string, data: string }) => void): () => void;
     }
 }
 

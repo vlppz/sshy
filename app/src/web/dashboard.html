@@ -31,47 +31,71 @@
     <script type="module" src="js/index.bundle.js"></script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <header class="dashboard-header">
-            <div class="header-content">
-                <div class="header-title-section">
-                    <h1 class="dashboard-title">SSH Servers</h1>
-                </div>
-                <div class="header-actions">
-                    <div class="user-info">
-                        <span id="user-email"></span>
-                        <button id="logout-btn" class="system-btn">
-                            <i class="bi bi-box-arrow-right"></i>
-                            <span>Logout</span>
-                        </button>
-                    </div>
-                    <button id="theme-toggle" class="system-btn">
-                        <i class="bi bi-moon"></i>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <main class="servers-grid">
-            <!-- Empty state (shown when no servers are added) -->
-            <div class="empty-state">
-                <div class="empty-state-icon">
+    <div class="app-container">
+        <!-- Tab Bar at the top of the application -->
+        <div class="tabs-container">
+            <div class="tabs-wrapper">
+                <div class="tab active" data-tab-id="dashboard">
                     <i class="bi bi-hdd-network"></i>
+                    <span>Main</span>
                 </div>
-                <h3>Welcome to SSHY - All in one SSH manager</h3>
-                <p class="empty-state-text">Add your first SSH server to get started</p>
-                <button class="primary-btn add-server-btn-empty">
+                <!-- Additional tabs will be added dynamically -->
+            </div>
+            <div class="tab-actions">
+                <button id="new-tab-btn" class="new-tab-btn">
                     <i class="bi bi-plus-lg"></i>
-                    <span>Add Server</span>
                 </button>
             </div>
-        </main>
-    </div>
+        </div>
+        
+        <!-- Main content area that holds tab content -->
+        <div class="tab-content-container">
+            <!-- Dashboard Tab Content -->
+            <div class="tab-content active" id="dashboard-tab-content">
+                <header class="dashboard-header">
+                    <div class="header-content">
+                        <div class="header-title-section">
+                            <h1 class="dashboard-title">SSH Servers</h1>
+                        </div>
+                        <div class="header-actions">
+                            <div class="user-info">
+                                <span id="user-email"></span>
+                                <button id="logout-btn" class="system-btn">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                            <button id="theme-toggle" class="system-btn">
+                                <i class="bi bi-moon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </header>
 
-    <!-- Floating Action Button -->
-    <button class="fab add-server-btn">
-        <i class="bi bi-plus-lg"></i>
-    </button>
+                <main class="servers-grid">
+                    <!-- Empty state (shown when no servers are added) -->
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="bi bi-hdd-network"></i>
+                        </div>
+                        <h3>Welcome to SSHY - All in one SSH manager</h3>
+                        <p class="empty-state-text">Add your first SSH server to get started</p>
+                        <button class="primary-btn add-server-btn-empty">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>Add Server</span>
+                        </button>
+                    </div>
+                </main>
+                
+                <!-- Floating Action Button -->
+                <button class="fab add-server-btn">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            
+            <!-- Terminal tabs content will be added dynamically -->
+        </div>
+    </div>
 
     <!-- Add Server Modal -->
     <div class="modal" id="add-server-modal">
@@ -101,7 +125,7 @@
                         <div class="form-group">
                             <label>Authentication Method</label>
                             <div class="auth-toggle">
-                                <button type="button" class="auth-option active" data-auth="key">SSH Key</button>
+                                <button type="button" class="auth-option active" data-auth="key">SSH Keys</button>
                                 <button type="button" class="auth-option" data-auth="password">Password</button>
                             </div>
                         </div>
@@ -173,7 +197,7 @@
                         <div class="form-group">
                             <label>Authentication Method</label>
                             <div class="auth-toggle">
-                                <button type="button" class="auth-option active" data-auth="key">SSH Key</button>
+                                <button type="button" class="auth-option active" data-auth="key">SSH Keys</button>
                                 <button type="button" class="auth-option" data-auth="password">Password</button>
                             </div>
                         </div>
@@ -209,12 +233,33 @@
                     </div>
                 </form>
             </div>
+
             <div class="form-actions">
                 <button type="button" class="system-btn" id="cancel-edit-server">Cancel</button>
                 <button type="button" class="primary-btn" id="submit-edit-server">Save Changes</button>
             </div>
         </div>
     </div>
+
+    <template id="terminal-tab-template">
+        <div class="tab" data-tab-id="">
+            <i class="bi bi-terminal"></i>
+            <span class="tab-label"></span>
+            <button class="tab-close-btn">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+    </template>
+    
+    <template id="terminal-content-template">
+        <div class="tab-content terminal-tab-content" id="">
+            <div class="terminal-container">
+                <div class="terminal-content">
+                    <div class="terminal-instance"></div>
+                </div>
+            </div>
+        </div>
+    </template>
 
     <script>
         // Check if user is authenticated
@@ -383,6 +428,79 @@
                 const serverCard = e.target.closest('.server-card');
                 const serverName = serverCard.querySelector('.server-name').textContent;
                 console.log(`Editing ${serverName}`);
+            });
+        });
+    </script>
+    
+    <!-- Debug script for tab switching -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Debug script loaded');
+            
+            // Manual tab switching functionality
+            document.addEventListener('click', (event) => {
+                const target = event.target;
+                const tab = target.closest('.tab');
+                
+                if (tab && !target.closest('.tab-close-btn')) {
+                    const tabId = tab.dataset.tabId;
+                    console.log('Tab clicked:', tabId);
+                    
+                    // Deactivate all tabs and content
+                    document.querySelectorAll('.tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Activate the selected tab
+                    tab.classList.add('active');
+                    
+                    // Activate the tab content
+                    const contentId = tabId === 'dashboard' ? 'dashboard-tab-content' : `${tabId}-content`;
+                    const contentElement = document.getElementById(contentId);
+                    console.log('Content element found:', contentElement ? true : false);
+                    
+                    if (contentElement) {
+                        contentElement.classList.add('active');
+                    }
+                }
+            });
+            
+            // Close tab functionality
+            document.addEventListener('click', (event) => {
+                const target = event.target;
+                const closeBtn = target.closest('.tab-close-btn');
+                
+                if (closeBtn) {
+                    const tab = closeBtn.closest('.tab');
+                    if (tab) {
+                        const tabId = tab.dataset.tabId;
+                        console.log('Closing tab:', tabId);
+                        
+                        // Remove content
+                        const contentElement = document.getElementById(`${tabId}-content`);
+                        if (contentElement) {
+                            contentElement.remove();
+                        }
+                        
+                        // Check if this was the active tab
+                        const wasActive = tab.classList.contains('active');
+                        
+                        // Remove tab
+                        tab.remove();
+                        
+                        // If this was active, activate dashboard
+                        if (wasActive) {
+                            const dashboardTab = document.querySelector('.tab[data-tab-id="dashboard"]');
+                            if (dashboardTab) {
+                                dashboardTab.click();
+                            }
+                        }
+                    }
+                }
             });
         });
     </script>
