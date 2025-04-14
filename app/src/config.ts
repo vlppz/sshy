@@ -6,7 +6,7 @@
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // API configuration
-export const API_URL = 'http://localhost:8000';
+export const API_URL = 'https://sshyapi.vlppz.ru';
 
 // Other configuration settings can be added here
-export const APP_VERSION = '0.1.0'; 
+export const APP_VERSION = '0.1.0';

@@ -1,7 +1,7 @@
 {
   "name": "app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Secure SSH Connection Manager",
   "main": "dist/main.js",
   "scripts": {
     "build": "npm run build:bundle && npm run copy-web",
@@ -11,7 +11,33 @@
     "dev": "concurrently \"npm run watch\" \"npm run copy-web:watch\" \"electron .\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "copy-web": "cp -r src/web/styles dist/web/ && cp src/web/*.html dist/web/",
-    "copy-web:watch": "nodemon --watch src/web -e html,css --exec \"npm run copy-web\""
+    "copy-web:watch": "nodemon --watch src/web -e html,css --exec \"npm run copy-web\"",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.vlppz.sshy",
+    "productName": "SSHY",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "src/assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   },
   "keywords": [],
   "author": "",
@@ -22,6 +48,7 @@
     "concurrently": "^8.2.2",
     "css-loader": "^7.1.2",
     "electron": "^35.1.4",
+    "electron-builder": "^24.13.3",
     "nodemon": "^3.1.0",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.2",
