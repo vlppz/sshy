@@ -15,6 +15,7 @@
     "pack": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
     "dist:win": "npm run build && electron-builder --win",
+    "dist:win64": "npm run build && electron-builder --win --x64",
     "dist:mac": "npm run build && electron-builder --mac",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -42,6 +43,22 @@
       "node_modules/asn1/**/*",
       "node_modules/bcrypt-pbkdf/**/*"
     ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "src/assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
     "mac": {
       "target": [
         "dmg",
@@ -52,11 +69,10 @@
       "darkModeSupport": true,
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
-      "entitlements": "build_essentials/entitlements.mac.plist",
-      "entitlementsInherit": "build_essentials/entitlements.mac.plist"
+      "identity": "EDITED"
     },
     "dmg": {
-      "sign": false,
+      "sign": true,
       "contents": [
         {
           "x": 130,
@@ -69,18 +85,6 @@
           "path": "/Applications"
         }
       ]
-    },
-    "win": {
-      "target": [
-        "nsis"
-      ],
-      "icon": "src/assets/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
     }
   },
   "keywords": [],
