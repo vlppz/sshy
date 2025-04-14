@@ -14,7 +14,9 @@
     "copy-web:watch": "nodemon --watch src/web -e html,css --exec \"npm run copy-web\"",
     "pack": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
-    "dist:win": "npm run build && electron-builder --win"
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "appId": "com.vlppz.sshy",
@@ -24,8 +26,50 @@
     },
     "files": [
       "dist/**/*",
-      "package.json"
+      "package.json",
+      "node_modules/**/*"
     ],
+    "extraResources": [
+      {
+        "from": "node_modules/",
+        "to": "node_modules",
+        "filter": ["**/*"]
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/ssh2/**/*",
+      "node_modules/node-ssh/**/*",
+      "node_modules/asn1/**/*",
+      "node_modules/bcrypt-pbkdf/**/*"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.developer-tools",
+      "icon": "src/assets/icon.icns",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build_essentials/entitlements.mac.plist",
+      "entitlementsInherit": "build_essentials/entitlements.mac.plist"
+    },
+    "dmg": {
+      "sign": false,
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
     "win": {
       "target": [
         "nsis"
@@ -61,9 +105,18 @@
     "@xterm/addon-web-links": "^0.11.0",
     "@xterm/addon-webgl": "^0.18.0",
     "@xterm/xterm": "^5.5.0",
+    "asn1": "^0.2.6",
     "axios": "^1.8.4",
+    "bcrypt-pbkdf": "^1.0.2",
     "crypto-js": "^4.2.0",
+    "is-stream": "^4.0.1",
+    "make-dir": "^5.0.0",
     "node-ssh": "^13.2.1",
-    "ssh2": "^1.16.0"
+    "safer-buffer": "^2.1.2",
+    "sb-promise-queue": "^2.1.0",
+    "sb-scandir": "^3.1.0",
+    "shell-escape": "^0.2.0",
+    "ssh2": "^1.16.0",
+    "tweetnacl": "^1.0.3"
   }
 }

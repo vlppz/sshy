@@ -16,6 +16,7 @@ out/
 .next/
 .nuxt/
 .output/
+release/
 
 # Environment variables
 .env
